@@ -1,7 +1,7 @@
-use std::io;
-use std::cmp::Ordering;
+use std::{self,io,cmp::Ordering,str::FromStr, num::ParseIntError};
 use rand::Rng;
 
+#[derive(Debug)]
 pub struct Guess {
     value: i32,
 }
@@ -19,7 +19,15 @@ impl Guess {
         self.value
     }
 }
+impl FromStr for Guess {
+    type Err = ParseIntError;
 
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let guess_fromstr = s.parse::<i32>()?;
+
+        Ok(Guess {value: guess_fromstr})
+    }
+}
 fn main() {
     println!("Guess the number!");
 
@@ -33,14 +41,14 @@ fn main() {
         io::stdin().read_line(&mut guess)
             .expect("Failed to read line");
 
-        let guess: u32 = match guess.trim().parse(){
+        let guess: Guess = match guess.trim().parse(){
             Ok(num) => num,
             Err(_) => continue,
         };
             
-        println!("You guessed: {}", guess);
+        println!("You guessed: {}", guess.value);
     
-        match guess.cmp(&secret_number) {
+        match guess.value.cmp(&secret_number) {
             Ordering::Less => println!("Too small!"),
             Ordering::Greater => println!("Too big!"),
             Ordering::Equal =>{ 
